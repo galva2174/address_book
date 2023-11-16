@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
+#include <regex>
 
 using namespace std;
 
@@ -55,20 +56,30 @@ void displayContacts(const Contact contacts[], int numContacts) {
     cout << "Address Book:" << endl;
     for (int i = 0; i < numContacts; ++i) {
         cout << "Name: " << contacts[i].name << "\tPhone Number: " << contacts[i].phoneNumber
-             << "\tEmail Address: " << contacts[i].emailAddress << "\tHome Address: " << contacts[i].homeAddress << endl;
+             << "Email Address: " << contacts[i].emailAddress << "\tHome Address: " << contacts[i].homeAddress << endl;
     }
 }
+
+bool check_digits(string x);
+bool check_numbers(string x);
+bool checkEmailFormat(const string& email);
 
 void addContact(Contact contacts[], int& numContacts) {
     if (numContacts < MAX_CONTACTS) {
         cout << "Enter the name of the new contact: ";
         getline(cin, contacts[numContacts].name);
 
-        cout << "Enter the phone number of the new contact: ";
-        getline(cin, contacts[numContacts].phoneNumber);
+        // Adding phone number validation
+        do {
+            cout << "Enter the phone number of the new contact (10 digits only): ";
+            getline(cin, contacts[numContacts].phoneNumber);
+        } while (!check_digits(contacts[numContacts].phoneNumber) || !check_numbers(contacts[numContacts].phoneNumber));
 
-        cout << "Enter the email address of the new contact: ";
-        getline(cin, contacts[numContacts].emailAddress);
+        // Adding email validation
+        do {
+            cout << "Enter the email address of the new contact: ";
+            getline(cin, contacts[numContacts].emailAddress);
+        } while (!checkEmailFormat(contacts[numContacts].emailAddress));
 
         cout << "Enter the home address of the new contact: ";
         getline(cin, contacts[numContacts].homeAddress);
@@ -79,6 +90,7 @@ void addContact(Contact contacts[], int& numContacts) {
         cerr << "Maximum number of contacts reached!" << endl;
     }
 }
+
 
 void searchContact(const Contact contacts[], int numContacts) {
     string searchName;
@@ -144,6 +156,42 @@ void deleteContact(Contact contacts[], int& numContacts) {
     }
 
     cout << "Contact not found." << endl;
+}
+
+bool check_digits(string x) 
+{ 
+    if (x.length() == 10) 
+        return true; 
+    else
+        return false; 
+}
+
+bool check_numbers(string x) 
+{ 
+    bool check = true; 
+  
+    for (size_t i = 0; i < x.length(); i++) { 
+        if (!(int(x[i]) >= 48 && int(x[i]) <= 57)) { 
+            check = false; 
+            break; 
+        } 
+    } 
+  
+    if (check == true) 
+        return true; 
+  
+    if (check == false) 
+        return false; 
+  
+    cout << endl << endl; 
+    system("pause"); 
+    system("cls"); 
+} 
+
+bool checkEmailFormat(const string& email) {
+    // Use regular expression for basic email format validation
+    const regex pattern("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
+    return regex_match(email, pattern);
 }
 
 int main() {
